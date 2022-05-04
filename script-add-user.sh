@@ -9,17 +9,17 @@
 input="$1"
 while IFS= read -r line
 do
-  login=$(cut -d":" -f1 <<< "$line")
+  login=$(cut -d: -f1 <<< "$line")
 
-  prenom=$(cut -d":" -f2 <<< "$line")
+  prenom=$(cut -d: -f2 <<< "$line")
 
-  nom=$(cut -d":" -f3 <<< "$line")
+  nom=$(cut -d: -f3 <<< "$line")
 
-  motdepasse=$(cut -d":" -f4 <<< "$line")
+  motdepasse=$(cut -d: -f4 <<< "$line")
 
   motdepasse_crypt=$(perl -e 'print crypt($ARGV[0], "motdepasse")' $motdepasse)
 
-cut -d -f 1 /etc/passwd | egrep "^$login" >/dev/null
+cut -d: -f 1 /etc/passwd | grep "^$login" >/dev/null
 
 
 if [ $? -eq 0 ]; then
@@ -29,13 +29,14 @@ if [ $? -eq 0 ]; then
 	exit 1
 else
 
-useradd -m -p $motdepassee -c $prenom $nom $login 
+useradd -m -p "$motdepasse" "$login" -c "$prenom $nom"  
 
 passwd --expire $login
 
-#for i in `seq 8`
-#do
-#  rdm=$(
+for i in `seq 8`
+do
+  touch /home/$login/$i
+done
 
  [ $? -eq 0 ] && echo "Utilisateur ajouter a /etc/passwd" || echo "Erreur dans l'ajout de l'utilisateur"
 fi
